@@ -31,7 +31,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto text-center relative">
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-white/70 mb-8">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-            El Airbnb de las bodegas en Chile
+            Tu bodega inteligente en Chile
           </div>
           <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-6">
             Tu bodega ideal,{' '}
@@ -199,7 +199,65 @@ export default function Home() {
             <span>Asegurado por HDI & BCI Seguros</span>
           </div>
         </div>
-      </footer>
+      </footer>{/* COMPARADOR */}
+<section className="py-24 px-6 border-t border-white/5">
+  <div className="max-w-6xl mx-auto">
+    <div className="text-center mb-12">
+      <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">Benchmark real</p>
+      <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-3">¿Por qué Storly?</h2>
+      <p className="text-white/50 text-lg">Validado con usuarias reales — no son promesas</p>
+    </div>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse">
+        <thead>
+          <tr>
+            <th className="text-left p-4 text-xs uppercase tracking-widest text-white/40 border-b border-white/5">Característica</th>
+            <th className="text-center p-4 text-xs uppercase tracking-widest text-white/40 border-b border-white/5">Self Storage</th>
+            <th className="text-center p-4 text-xs uppercase tracking-widest text-white/40 border-b border-white/5">Yapo / Facebook</th>
+            <th className="text-center p-4 text-xs uppercase tracking-widest text-white/40 border-b border-white/5">Informal</th>
+            <th className="text-center p-4 text-xs uppercase tracking-widest text-amber-400 border-b border-amber-400/30 bg-amber-400/5 rounded-t-xl">✦ Storly</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            { feat: 'Flexibilidad', sub: 'Días, semanas o meses', vals: ['Solo mensual', 'Alta', 'Alta', 'Alta'], types: ['no', 'yes', 'yes', 'yes'] },
+            { feat: 'Costo accesible', sub: 'Sin costos fijos altos', vals: ['Caro', 'Gratis', 'Muy bajo', 'Medio'], types: ['no', 'yes', 'yes', 'partial'] },
+            { feat: 'Seguro de inventario', sub: 'Póliza ante daño o pérdida', vals: ['Sí', 'No', 'No', 'Básico + Plus'], types: ['yes', 'no', 'no', 'yes'] },
+            { feat: 'Verificación de identidad', sub: 'KYC + biometría', vals: ['No', 'No', 'No', 'KYC + biometría'], types: ['no', 'no', 'no', 'yes'] },
+            { feat: 'Pago con escrow', sub: 'Retención hasta entrega', vals: ['Sí', 'No', 'No', 'Mercado Pago'], types: ['yes', 'no', 'no', 'yes'] },
+            { feat: 'Sistema de reputación', sub: 'Evaluaciones bidireccionales', vals: ['No', 'Limitado', 'No', 'Bidireccional'], types: ['no', 'partial', 'no', 'yes'] },
+            { feat: 'Tasa de cierre', sub: 'Validado A/B test real', vals: ['Media', '27%', '~30%', '80%'], types: ['partial', 'no', 'no', 'yes'] },
+          ].map((row, i) => (
+            <tr key={i} className="border-b border-white/5 hover:bg-white/2 transition-colors">
+              <td className="p-4">
+                <div className="font-semibold text-sm text-white">{row.feat}</div>
+                <div className="text-xs text-white/40 mt-0.5">{row.sub}</div>
+              </td>
+              {row.vals.map((val, j) => (
+                <td key={j} className={`p-4 text-center ${j === 3 ? 'bg-amber-400/5' : ''}`}>
+                  <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                    row.types[j] === 'yes' ? 'bg-green-400/10 text-green-400' :
+                    row.types[j] === 'no' ? 'bg-red-400/10 text-red-400' :
+                    'bg-amber-400/10 text-amber-400'
+                  }`}>{val}</span>
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div className="mt-8 bg-gradient-to-r from-amber-950/40 to-orange-950/20 border border-amber-400/20 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div>
+        <p className="font-bold text-white">Único en Chile con KYC + escrow + póliza en un solo flujo</p>
+        <p className="text-white/50 text-sm mt-1">NPS 62 · 80% tasa de cierre · decisión en 2.8 min · validado con 20 usuarias reales</p>
+      </div>
+      <Link href="/auth/registro" className="bg-amber-400 text-black font-bold px-6 py-3 rounded-xl hover:bg-amber-300 transition-all whitespace-nowrap">
+        Comenzar gratis →
+      </Link>
+    </div>
+  </div>
+</section>
     </main>
   )
 }
