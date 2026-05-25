@@ -1,5 +1,82 @@
+'use client'
+import { useState } from 'react'
 import Link from 'next/link'
+'use client'
+function CalculadoraOferentes() {
+  const [metros, setMetros] = useState(6)
+  const [dias, setDias] = useState(20)
+  const [comuna, setComuna] = useState(1.0)
+  const [tipo, setTipo] = useState(8000)
 
+  const bruto = Math.round(tipo * comuna * (1 + (metros - 1) * 0.08) * dias)
+  const comision = Math.round(bruto * 0.12)
+  const neto = bruto - comision
+
+  const fmt = (n: number) => '$' + n.toLocaleString('es-CL')
+
+  return (
+    <div className="bg-white/3 border border-white/8 rounded-2xl overflow-hidden">
+      <div className="bg-white/5 px-6 py-4 border-b border-white/8 flex items-center gap-3">
+        <div className="w-9 h-9 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-lg">🏠</div>
+        <div>
+          <div className="font-bold">Simulador de ingresos</div>
+          <div className="text-xs text-white/40 mt-0.5">Basado en precios reales validados en Santiago</div>
+        </div>
+      </div>
+      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-white/50 uppercase tracking-widest">Tamaño del espacio (m²)</label>
+          <input type="range" min="1" max="50" step="1" value={metros} onChange={e => setMetros(Number(e.target.value))} className="w-full accent-amber-400" />
+          <div className="text-xl font-black text-amber-400">{metros} m²</div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-white/50 uppercase tracking-widest">Días disponibles al mes</label>
+          <input type="range" min="5" max="30" step="1" value={dias} onChange={e => setDias(Number(e.target.value))} className="w-full accent-amber-400" />
+          <div className="text-xl font-black text-amber-400">{dias} días</div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-white/50 uppercase tracking-widest">Comuna</label>
+          <select value={comuna} onChange={e => setComuna(Number(e.target.value))} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400/50">
+            <option value={1.2}>Providencia</option>
+            <option value={1.1}>Las Condes</option>
+            <option value={1.0}>Ñuñoa</option>
+            <option value={0.95}>La Florida</option>
+            <option value={0.9}>Maipú</option>
+            <option value={0.85}>Pudahuel</option>
+          </select>
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-white/50 uppercase tracking-widest">Tipo de espacio</label>
+          <select value={tipo} onChange={e => setTipo(Number(e.target.value))} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400/50">
+            <option value={8000}>Bodega / pieza</option>
+            <option value={6000}>Garage cubierto</option>
+            <option value={4500}>Patio / exterior</option>
+            <option value={5000}>Estacionamiento</option>
+          </select>
+        </div>
+        <div className="md:col-span-2 bg-[#2D4A3E] rounded-xl p-5 grid grid-cols-3 gap-4">
+          {[
+            { val: fmt(bruto), lbl: 'Ingreso bruto' },
+            { val: fmt(comision), lbl: 'Comisión Storly 12%' },
+            { val: fmt(neto), lbl: 'Tu ingreso neto' },
+          ].map((item, i) => (
+            <div key={i} className={`text-center ${i < 2 ? 'border-r border-white/10' : ''}`}>
+              <div className="text-xl font-black text-[#C8D9B0]">{item.val}</div>
+              <div className="text-xs text-[#9BB896] mt-1 uppercase tracking-wider">{item.lbl}</div>
+            </div>
+          ))}
+        </div>
+        <div className="md:col-span-2 bg-amber-400/10 border border-amber-400/20 rounded-xl p-4 text-sm text-amber-200/80">
+          💡 Con <strong>{metros} m²</strong> disponibles <strong>{dias} días</strong> al mes podrías ganar hasta <strong>{fmt(neto)}</strong> netos — sin inversión inicial.
+        </div>
+        <div className="md:col-span-2 flex gap-3">
+          <Link href="/auth/registro" className="flex-1 bg-amber-400 text-black font-bold px-6 py-3 rounded-xl hover:bg-amber-300 transition-all text-center text-sm">Publicar mi espacio →</Link>
+          <Link href="/buscar" className="flex-1 bg-white/5 border border-white/10 text-white font-semibold px-6 py-3 rounded-xl hover:bg-white/10 transition-all text-center text-sm">Ver espacios similares</Link>
+        </div>
+      </div>
+    </div>
+  )
+}
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#0a0a0f] text-white overflow-x-hidden">
@@ -256,6 +333,16 @@ export default function Home() {
         Comenzar gratis →
       </Link>
     </div>
+  </div>
+</section>{/* CALCULADORA OFERENTES */}
+<section className="py-24 px-6 border-t border-white/5">
+  <div className="max-w-4xl mx-auto">
+    <div className="text-center mb-12">
+      <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">Para oferentes</p>
+      <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-3">¿Cuánto puede ganar tu espacio?</h2>
+      <p className="text-white/50 text-lg">Calcula tus ingresos estimados según tu espacio y disponibilidad</p>
+    </div>
+    <CalculadoraOferentes />
   </div>
 </section>
     </main>
