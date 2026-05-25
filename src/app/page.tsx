@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-'use client'
 function CalculadoraOferentes() {
   const [metros, setMetros] = useState(6)
   const [dias, setDias] = useState(20)
