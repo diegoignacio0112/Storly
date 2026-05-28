@@ -269,10 +269,10 @@ export default function Home() {
             </div>
             <span className="font-bold text-sm">Storly</span>
           </div>
-          <p className="text-white/30 text-sm">© 2024 Storly. Todos los derechos reservados.</p>
+          <p className="text-white/30 text-sm">© 2025 Storly. Todos los derechos reservados.</p>
           <div className="flex items-center gap-2 text-white/30 text-sm">
             <span>🛡️</span>
-            <span>Asegurado por HDI & BCI Seguros</span>
+            <span>Storly — Almacenamiento colaborativo en Chile</span>
           </div>
         </div>
       </footer>{/* COMPARADOR */}
