@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: storly_postgres
+    environment:
+      POSTGRES_USER: storly_user
+      POSTGRES_PASSWORD: JPPRNJkqSYsFBE8I0w4eGRrsDnCnEGRkuIwlFQVXeU8=
+      POSTGRES_DB: storly_db
+      POSTGRES_INITDB_ARGS: '-c shared_buffers=256MB -c max_connections=200'
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - storly-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U storly_user -d storly_db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  db-data:
+    driver: local
+
+networks:
+  storly-network:
+    driver: bridge
