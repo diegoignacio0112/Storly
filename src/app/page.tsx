@@ -91,6 +91,7 @@ export default function Home() {
             <a href="#como-funciona" className="hover:text-white transition-colors">Cómo funciona</a>
             <a href="#seguridad" className="hover:text-white transition-colors">Seguridad</a>
             <a href="#para-quien" className="hover:text-white transition-colors">Para quién</a>
+            <Link href="/explorar" className="hover:text-white transition-colors">Explorar</Link>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/auth/login" className="text-sm text-white/70 hover:text-white transition-colors px-4 py-2">Iniciar sesión</Link>

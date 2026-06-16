@@ -76,6 +76,9 @@ export default function Dashboard() {
             <span className="text-sm text-white/40 hidden sm:block">
               Hola, <span className="text-white/70">{session?.user?.name}</span>
             </span>
+            <Link href="/explorar" className="text-sm text-white/50 hover:text-white transition-colors hidden lg:block">
+              Explorar
+            </Link>
             <Link
               href="/dashboard/nuevo"
               className="bg-amber-400 text-black font-bold text-sm px-4 py-2 rounded-lg hover:bg-amber-300 transition-all"
@@ -112,6 +115,20 @@ export default function Dashboard() {
               <p className="text-xs text-white/30 mt-1">{s.sub}</p>
             </div>
           ))}
+        </div>
+
+        {/* explore CTA */}
+        <div className="bg-[#2D4A3E]/20 border border-[#2D4A3E]/40 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <p className="font-bold text-white">Explorar el mercado</p>
+            <p className="text-sm text-white/40 mt-0.5">Ve todos los espacios disponibles en el mapa interactivo</p>
+          </div>
+          <Link
+            href="/explorar"
+            className="bg-amber-400 text-black font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-amber-300 transition-all whitespace-nowrap flex-shrink-0"
+          >
+            Explorar espacios →
+          </Link>
         </div>
 
         {/* spaces */}
