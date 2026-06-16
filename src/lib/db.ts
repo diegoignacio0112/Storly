@@ -14,7 +14,12 @@ const pool = new Pool({
   password: decodeURIComponent(dbUrl.password),
   ssl: process.env.NODE_ENV === 'production'
     ? { rejectUnauthorized: false }
-    : false
+    : false,
+  connectionTimeoutMillis: 10000,
+  idleTimeoutMillis: 30000,
+  max: 10,
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10000
 })
 
 export default pool
