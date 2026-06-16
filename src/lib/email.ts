@@ -2,11 +2,26 @@ import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
+// Resend free tier only allows sending to the account owner's email.
+// Set RESEND_OWNER_EMAIL to redirect all outgoing mail to that address.
+const OWNER_EMAIL = process.env.RESEND_OWNER_EMAIL
+
 export async function sendWelcomeEmail(nombre: string, email: string) {
-  await resend.emails.send({
+  const freeTierRedirect = !!OWNER_EMAIL && email !== OWNER_EMAIL
+  const to = freeTierRedirect ? OWNER_EMAIL! : email
+
+  if (freeTierRedirect) {
+    console.log(
+      `[email] Free-tier redirect: intended recipient <${email}> → sending to owner <${to}>`
+    )
+  }
+
+  const result = await resend.emails.send({
     from: 'Storly <onboarding@resend.dev>',
-    to: email,
-    subject: '¡Bienvenido a Storly!',
+    to,
+    subject: freeTierRedirect
+      ? `[TEST – intended for ${email}] ¡Bienvenido a Storly!`
+      : '¡Bienvenido a Storly!',
     html: `
       <!DOCTYPE html>
       <html>
@@ -18,6 +33,13 @@ export async function sendWelcomeEmail(nombre: string, email: string) {
             </div>
             <span style="color:white;font-size:20px;font-weight:700;">Storly</span>
           </div>
+          ${freeTierRedirect ? `
+          <div style="background:#7c2d12;border:1px solid #c2410c;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+            <p style="color:#fed7aa;font-size:12px;margin:0;">
+              <strong>DEV NOTE:</strong> This email was intended for <strong>${email}</strong>
+              but redirected to the Resend account owner (free-tier limitation).
+            </p>
+          </div>` : ''}
           <div style="background:#0f1a14;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:40px;">
             <h1 style="color:white;font-size:28px;margin:0 0 8px;">¡Hola, ${nombre}! 👋</h1>
             <p style="color:#C9A84C;font-size:14px;margin:0 0 24px;">Tu bodega inteligente en Chile</p>
@@ -42,4 +64,6 @@ export async function sendWelcomeEmail(nombre: string, email: string) {
       </html>
     `
   })
+
+  return result
 }

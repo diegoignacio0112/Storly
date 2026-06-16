@@ -37,9 +37,16 @@ export async function POST(request: Request) {
     const newUser = result.rows[0]
 
     // Fire-and-forget — don't fail registration if email fails
-    sendWelcomeEmail(newUser.nombre, newUser.email).catch(err =>
-      console.error('Welcome email failed:', err)
-    )
+    sendWelcomeEmail(newUser.nombre, newUser.email)
+      .then(result => {
+        console.log('[email] Welcome email sent:', JSON.stringify(result))
+      })
+      .catch(err => {
+        console.error('[email] Welcome email failed for:', newUser.email)
+        console.error('[email] Error name:', err?.name)
+        console.error('[email] Error message:', err?.message)
+        console.error('[email] Error details:', JSON.stringify(err, null, 2))
+      })
 
     return NextResponse.json(newUser, { status: 201 })
   } catch (error) {
