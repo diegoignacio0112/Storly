@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import pool from '@/lib/db'
+import { sendWelcomeEmail } from '@/lib/email'
 
 export async function POST(request: Request) {
   try {
@@ -33,7 +34,14 @@ export async function POST(request: Request) {
       [nombre, email, password_hash, telefono || null]
     )
 
-    return NextResponse.json(result.rows[0], { status: 201 })
+    const newUser = result.rows[0]
+
+    // Fire-and-forget — don't fail registration if email fails
+    sendWelcomeEmail(newUser.nombre, newUser.email).catch(err =>
+      console.error('Welcome email failed:', err)
+    )
+
+    return NextResponse.json(newUser, { status: 201 })
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     console.error(error)
