@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -14,6 +14,15 @@ const COMUNAS = [
   'Santiago','Vitacura',
 ]
 
+const TIPO_OPTS = [
+  { value: 'bodega', label: 'Bodega' },
+  { value: 'garage', label: 'Garage' },
+  { value: 'patio', label: 'Patio' },
+  { value: 'pieza', label: 'Pieza' },
+  { value: 'estacionamiento', label: 'Estacionamiento' },
+  { value: 'otro', label: 'Otro' },
+]
+
 const CARACTERISTICAS_OPTS = [
   { key: 'iluminacion', label: 'Iluminación', icon: '💡' },
   { key: 'ventilacion', label: 'Ventilación', icon: '🌬️' },
@@ -22,6 +31,67 @@ const CARACTERISTICAS_OPTS = [
   { key: 'camaras', label: 'Cámaras', icon: '📷' },
   { key: 'candado_propio', label: 'Candado propio', icon: '🔒' },
 ]
+
+function Select({
+  value, onChange, options, placeholder = 'Selecciona...',
+}: {
+  value: string
+  onChange: (v: string) => void
+  options: { value: string; label: string }[]
+  placeholder?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const selected = options.find(o => o.value === value)
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className={`w-full bg-white/5 border rounded-xl px-4 py-3 text-sm text-left flex items-center justify-between transition-all focus:outline-none ${
+          open ? 'border-amber-400/50 bg-white/8' : 'border-white/10 hover:border-white/20'
+        }`}
+      >
+        <span className={selected ? 'text-white' : 'text-white/25'}>{selected?.label ?? placeholder}</span>
+        <svg
+          className={`w-4 h-4 text-white/30 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#0a0a0f] border border-white/10 rounded-xl overflow-hidden z-50 shadow-2xl shadow-black/60 max-h-56 overflow-y-auto">
+          {options.map(opt => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => { onChange(opt.value); setOpen(false) }}
+              className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                value === opt.value
+                  ? 'bg-amber-400/10 text-amber-300 font-medium'
+                  : 'text-white/60 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 function compressImage(file: File): Promise<string> {
   return new Promise((resolve) => {
@@ -67,7 +137,6 @@ function Field({ label, optional, children }: { label: string; optional?: boolea
 }
 
 const inputCls = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-amber-400/50 focus:bg-white/8 transition-all'
-const selectCls = 'w-full bg-[#0d0d14] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400/50 transition-all appearance-none cursor-pointer'
 
 export default function NuevoEspacio() {
   const { data: session } = useSession()
@@ -103,6 +172,7 @@ export default function NuevoEspacio() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!session?.user?.id) return
+    if (!form.comuna) { setError('Por favor selecciona una comuna'); return }
     setLoading(true); setError('')
 
     const res = await fetch('/api/espacios', {
@@ -124,7 +194,6 @@ export default function NuevoEspacio() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white">
-      {/* nav */}
       <nav className="border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
@@ -151,7 +220,6 @@ export default function NuevoEspacio() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* basic info */}
           <Section title="Información básica">
             <Field label="Título del espacio">
               <input type="text" required className={inputCls} placeholder="Ej: Bodega climatizada Las Condes"
@@ -159,14 +227,11 @@ export default function NuevoEspacio() {
             </Field>
             <div className="grid grid-cols-2 gap-4">
               <Field label="Tipo de espacio">
-                <select required className={selectCls} value={form.tipo} onChange={e => set('tipo', e.target.value)}>
-                  <option value="bodega">Bodega</option>
-                  <option value="garage">Garage</option>
-                  <option value="patio">Patio</option>
-                  <option value="pieza">Pieza</option>
-                  <option value="estacionamiento">Estacionamiento</option>
-                  <option value="otro">Otro</option>
-                </select>
+                <Select
+                  value={form.tipo}
+                  onChange={v => set('tipo', v)}
+                  options={TIPO_OPTS}
+                />
               </Field>
               <Field label="Disponibilidad">
                 <button
@@ -189,7 +254,6 @@ export default function NuevoEspacio() {
             </Field>
           </Section>
 
-          {/* details */}
           <Section title="Detalles del espacio">
             <div className="grid grid-cols-2 gap-4">
               <Field label="Metros cuadrados" optional>
@@ -209,21 +273,21 @@ export default function NuevoEspacio() {
             )}
           </Section>
 
-          {/* location */}
           <Section title="Ubicación">
             <Field label="Dirección completa" optional>
               <input type="text" className={inputCls} placeholder="Ej: Av. Apoquindo 3000, Piso 2"
                 value={form.direccion} onChange={e => set('direccion', e.target.value)} />
             </Field>
             <Field label="Comuna">
-              <select required className={selectCls} value={form.comuna} onChange={e => set('comuna', e.target.value)}>
-                <option value="">Selecciona una comuna</option>
-                {COMUNAS.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
+              <Select
+                value={form.comuna}
+                onChange={v => set('comuna', v)}
+                options={COMUNAS.map(c => ({ value: c, label: c }))}
+                placeholder="Selecciona una comuna"
+              />
             </Field>
           </Section>
 
-          {/* contact */}
           <Section title="Información de contacto">
             <div className="grid grid-cols-2 gap-4">
               <Field label="Nombre de contacto" optional>
@@ -247,7 +311,6 @@ export default function NuevoEspacio() {
             </div>
           </Section>
 
-          {/* features */}
           <Section title="Características adicionales">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {CARACTERISTICAS_OPTS.map(opt => {
@@ -272,16 +335,8 @@ export default function NuevoEspacio() {
             </div>
           </Section>
 
-          {/* photos */}
           <Section title="Fotos del espacio">
-            <input
-              ref={fileRef}
-              type="file"
-              multiple
-              accept="image/*"
-              className="hidden"
-              onChange={handleImages}
-            />
+            <input ref={fileRef} type="file" multiple accept="image/*" className="hidden" onChange={handleImages} />
             {imagenes.length < 8 && (
               <button
                 type="button"
@@ -315,7 +370,6 @@ export default function NuevoEspacio() {
             )}
           </Section>
 
-          {/* conditions */}
           <Section title="Condiciones especiales">
             <Field label="Condiciones adicionales" optional>
               <textarea rows={3} className={inputCls}
@@ -324,7 +378,6 @@ export default function NuevoEspacio() {
             </Field>
           </Section>
 
-          {/* submit */}
           <button
             type="submit"
             disabled={loading}
