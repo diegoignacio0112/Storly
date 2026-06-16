@@ -67,7 +67,7 @@ function Field({ label, optional, children }: { label: string; optional?: boolea
 }
 
 const inputCls = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-amber-400/50 focus:bg-white/8 transition-all'
-const selectCls = inputCls + ' appearance-none cursor-pointer'
+const selectCls = 'w-full bg-[#0d0d14] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400/50 transition-all appearance-none cursor-pointer'
 
 export default function NuevoEspacio() {
   const { data: session } = useSession()
