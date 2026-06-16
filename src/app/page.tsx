@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 function CalculadoraOferentes() {
@@ -79,6 +79,14 @@ function CalculadoraOferentes() {
 }
 export default function Home() {
   const { data: session, status } = useSession()
+  const [stats, setStats] = useState({ espacios: 0, usuarios: 0, reservas: 0 })
+
+  useEffect(() => {
+    fetch('/api/stats')
+      .then(r => r.json())
+      .then(d => setStats(d))
+      .catch(() => {})
+  }, [])
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] text-white overflow-x-hidden">
@@ -101,9 +109,8 @@ export default function Home() {
               <div className="w-28 h-8 bg-white/10 rounded-lg animate-pulse" />
             ) : session?.user ? (
               <>
-                <span className="text-sm text-white/50 hidden sm:block">
-                  Hola, <span className="text-white/80">{session.user.name}</span>
-                </span>
+                <Link href="/mensajes" className="text-sm text-white/50 hover:text-white transition-colors hidden sm:block">Mensajes</Link>
+                <Link href="/perfil" className="text-sm text-white/50 hover:text-white transition-colors hidden sm:block">Perfil</Link>
                 <Link href="/dashboard" className="text-sm bg-amber-400 text-black font-semibold px-4 py-2 rounded-lg hover:bg-amber-300 transition-colors">
                   Dashboard
                 </Link>
@@ -140,7 +147,11 @@ export default function Home() {
             <Link href="/auth/registro" className="w-full sm:w-auto bg-white/5 border border-white/10 text-white font-semibold px-8 py-4 rounded-xl hover:bg-white/10 transition-all text-base">Publicar mi espacio</Link>
           </div>
           <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
-            {[{ value: '100%', label: 'Digital' }, { value: '24/7', label: 'Disponible' }, { value: '0$', label: 'Para publicar' }].map((s) => (
+            {[
+              { value: stats.espacios > 0 ? stats.espacios.toString() : '—', label: 'Espacios disponibles' },
+              { value: stats.usuarios > 0 ? stats.usuarios.toString() : '—', label: 'Usuarios registrados' },
+              { value: '$0', label: 'Para publicar' },
+            ].map((s) => (
               <div key={s.label} className="text-center">
                 <div className="text-2xl font-black text-amber-400">{s.value}</div>
                 <div className="text-sm text-white/40 mt-1">{s.label}</div>

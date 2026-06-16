@@ -73,12 +73,12 @@ export default function Dashboard() {
             <span className="font-bold text-lg tracking-tight">Storly</span>
           </Link>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-white/40 hidden sm:block">
+            <span className="text-sm text-white/40 hidden lg:block">
               Hola, <span className="text-white/70">{session?.user?.name}</span>
             </span>
-            <Link href="/explorar" className="text-sm text-white/50 hover:text-white transition-colors hidden lg:block">
-              Explorar
-            </Link>
+            <Link href="/explorar" className="text-sm text-white/50 hover:text-white transition-colors hidden lg:block">Explorar</Link>
+            <Link href="/mensajes" className="text-sm text-white/50 hover:text-white transition-colors hidden sm:block">Mensajes</Link>
+            <Link href="/perfil" className="text-sm text-white/50 hover:text-white transition-colors hidden sm:block">Perfil</Link>
             <Link
               href="/dashboard/nuevo"
               className="bg-amber-400 text-black font-bold text-sm px-4 py-2 rounded-lg hover:bg-amber-300 transition-all"
