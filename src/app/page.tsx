@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 function CalculadoraOferentes() {
   const [metros, setMetros] = useState(6)
   const [dias, setDias] = useState(20)
@@ -77,6 +78,8 @@ function CalculadoraOferentes() {
   )
 }
 export default function Home() {
+  const { data: session, status } = useSession()
+
   return (
     <main className="min-h-screen bg-[#0a0a0f] text-white overflow-x-hidden">
       <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-xl">
@@ -94,8 +97,23 @@ export default function Home() {
             <Link href="/explorar" className="hover:text-white transition-colors">Explorar</Link>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/auth/login" className="text-sm text-white/70 hover:text-white transition-colors px-4 py-2">Iniciar sesión</Link>
-            <Link href="/auth/registro" className="text-sm bg-amber-400 text-black font-semibold px-4 py-2 rounded-lg hover:bg-amber-300 transition-colors">Comenzar gratis</Link>
+            {status === 'loading' ? (
+              <div className="w-28 h-8 bg-white/10 rounded-lg animate-pulse" />
+            ) : session?.user ? (
+              <>
+                <span className="text-sm text-white/50 hidden sm:block">
+                  Hola, <span className="text-white/80">{session.user.name}</span>
+                </span>
+                <Link href="/dashboard" className="text-sm bg-amber-400 text-black font-semibold px-4 py-2 rounded-lg hover:bg-amber-300 transition-colors">
+                  Dashboard
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login" className="text-sm text-white/70 hover:text-white transition-colors px-4 py-2">Iniciar sesión</Link>
+                <Link href="/auth/registro" className="text-sm bg-amber-400 text-black font-semibold px-4 py-2 rounded-lg hover:bg-amber-300 transition-colors">Comenzar gratis</Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
