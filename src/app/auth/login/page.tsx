@@ -1,11 +1,14 @@
 'use client'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function Login() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const registered = searchParams.get('registered')
+
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -31,48 +34,83 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-sm border p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Iniciar sesión</h1>
-        <p className="text-gray-500 mb-6">Bienvenido de vuelta a Storly</p>
+    <div className="min-h-screen bg-[#0a0a0f] text-white flex items-center justify-center p-4 relative overflow-hidden">
+      {/* background glow */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-amber-500/8 rounded-full blur-[120px] pointer-events-none" />
 
-        {error && <div className="bg-red-50 text-red-600 rounded-lg p-3 mb-4 text-sm">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              required
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
-            />
+      <div className="w-full max-w-md relative">
+        {/* logo */}
+        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+            <span className="text-black font-black text-sm">S</span>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-            <input
-              type="password"
-              required
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={form.password}
-              onChange={e => setForm({ ...form, password: e.target.value })}
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white rounded-lg py-2 font-medium hover:bg-blue-700 disabled:opacity-50"
-          >
-            {loading ? 'Ingresando...' : 'Iniciar sesión'}
-          </button>
-        </form>
+          <span className="font-bold text-lg tracking-tight">Storly</span>
+        </Link>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
-          ¿No tienes cuenta?{' '}
-          <Link href="/auth/registro" className="text-blue-600 hover:underline">Regístrate</Link>
-        </p>
+        <div className="bg-white/3 border border-white/8 rounded-2xl p-8">
+          <h1 className="text-2xl font-black tracking-tight mb-1">Iniciar sesión</h1>
+          <p className="text-white/40 text-sm mb-6">Bienvenido de vuelta a Storly</p>
+
+          {registered && (
+            <div className="bg-[#2D4A3E]/60 border border-[#2D4A3E] text-[#C8D9B0] rounded-xl p-3 mb-4 text-sm">
+              Cuenta creada correctamente. Ahora puedes iniciar sesión.
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl p-3 mb-4 text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-white/50 uppercase tracking-widest mb-2">Email</label>
+              <input
+                type="email"
+                required
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-amber-400/50 focus:bg-white/8 transition-all"
+                placeholder="tu@email.com"
+                value={form.email}
+                onChange={e => setForm({ ...form, email: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-white/50 uppercase tracking-widest mb-2">Contraseña</label>
+              <input
+                type="password"
+                required
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-amber-400/50 focus:bg-white/8 transition-all"
+                placeholder="••••••••"
+                value={form.password}
+                onChange={e => setForm({ ...form, password: e.target.value })}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-amber-400 text-black font-bold py-3 rounded-xl hover:bg-amber-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            >
+              {loading ? 'Ingresando...' : 'Iniciar sesión'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-white/40 mt-6">
+            ¿No tienes cuenta?{' '}
+            <Link href="/auth/registro" className="text-[#C9A84C] hover:text-amber-300 transition-colors font-medium">
+              Regístrate gratis
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
+  )
+}
+
+export default function Login() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }
