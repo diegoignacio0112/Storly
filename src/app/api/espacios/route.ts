@@ -9,6 +9,16 @@ export async function GET(request: Request) {
     const comuna = searchParams.get('comuna')
     const tipo = searchParams.get('tipo')
     const maxPrecio = searchParams.get('maxPrecio')
+    const usuarioId = searchParams.get('usuario_id')
+
+    // When fetching own spaces, return all regardless of disponible
+    if (usuarioId) {
+      const result = await pool.query(
+        'SELECT * FROM espacios WHERE usuario_id = $1 ORDER BY created_at DESC',
+        [usuarioId]
+      )
+      return NextResponse.json(result.rows)
+    }
 
     let query = `
       SELECT e.*, u.nombre as oferente_nombre, u.email as oferente_email, u.telefono as oferente_telefono
@@ -52,16 +62,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    const { titulo, descripcion, tipo, metros_cuadrados, precio_mensual, comuna, direccion } = await request.json()
+    const {
+      titulo, descripcion, tipo, metros_cuadrados, precio_mensual,
+      comuna, direccion, disponible,
+      nombre_contacto, telefono_contacto, email_contacto,
+      horario_acceso, caracteristicas, imagenes, condiciones
+    } = await request.json()
 
     if (!titulo || !tipo || !precio_mensual || !comuna) {
       return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 })
     }
 
     const result = await pool.query(
-      `INSERT INTO espacios (usuario_id, titulo, descripcion, tipo, metros_cuadrados, precio_mensual, comuna, direccion)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [session.user.id, titulo, descripcion, tipo, metros_cuadrados, precio_mensual, comuna, direccion]
+      `INSERT INTO espacios (
+        usuario_id, titulo, descripcion, tipo, metros_cuadrados, precio_mensual,
+        comuna, direccion, disponible,
+        nombre_contacto, telefono_contacto, email_contacto,
+        horario_acceso, caracteristicas, imagenes, condiciones
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+      RETURNING *`,
+      [
+        session.user.id, titulo, descripcion || null, tipo,
+        metros_cuadrados || null, precio_mensual,
+        comuna, direccion || null, disponible ?? true,
+        nombre_contacto || null, telefono_contacto || null, email_contacto || null,
+        horario_acceso || null,
+        caracteristicas?.length ? caracteristicas : null,
+        imagenes?.length ? imagenes : null,
+        condiciones || null
+      ]
     )
 
     return NextResponse.json(result.rows[0], { status: 201 })
