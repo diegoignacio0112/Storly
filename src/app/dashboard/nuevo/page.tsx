@@ -255,6 +255,23 @@ export default function NuevoEspacio() {
           </Section>
 
           <Section title="Detalles del espacio">
+            <div className="bg-white/3 border border-white/8 rounded-xl p-4">
+              <p className="text-xs text-white/40 uppercase tracking-widest mb-3">Precios de referencia Storly (comisión 12%)</p>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { tier: 'Pequeño', size: '1–2 m³', price: '$35.000', net: '$30.800' },
+                  { tier: 'Mediano', size: '2–4 m³', price: '$48.500', net: '$42.680' },
+                  { tier: 'Grande', size: '4–6 m³', price: '$65.000', net: '$57.200' },
+                ].map((t) => (
+                  <div key={t.tier} className="text-center bg-[#2D4A3E]/20 border border-[#2D4A3E]/40 rounded-lg p-3">
+                    <div className="text-xs text-[#C9A84C] font-bold uppercase mb-1">{t.tier}</div>
+                    <div className="text-xs text-white/40 mb-2">{t.size}</div>
+                    <div className="text-sm font-bold text-white">{t.price}<span className="text-white/30 text-xs">/mes</span></div>
+                    <div className="text-xs text-[#9BB896] mt-1">neto {t.net}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <Field label="Metros cuadrados" optional>
                 <input type="number" min="1" className={inputCls} placeholder="Ej: 25"

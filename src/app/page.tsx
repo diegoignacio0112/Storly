@@ -167,17 +167,19 @@ export default function Home() {
             <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">Proceso simple</p>
             <h2 className="text-4xl md:text-5xl font-black tracking-tight">¿Cómo funciona?</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {[
-              { num: '01', icon: '🔍', title: 'Encuentra tu espacio', desc: 'Busca bodegas disponibles cerca de ti. Filtra por tamaño, precio y comuna.' },
-              { num: '02', icon: '📋', title: 'Reserva en minutos', desc: 'Selecciona las fechas, revisa el contrato digital y confirma tu reserva al instante.' },
-              { num: '03', icon: '📦', title: 'Guarda con tranquilidad', desc: 'Tu mercadería protegida con seguro incluido. Acceso flexible según tu plan.' },
+              { num: '01', icon: '🔍', title: 'Buscar', desc: 'Encuentra tu espacio ideal por tamaño, precio y comuna.' },
+              { num: '02', icon: '📅', title: 'Reservar', desc: 'Selecciona fechas y firma el contrato digital al instante.' },
+              { num: '03', icon: '🔐', title: 'Escrow', desc: 'Tu pago queda retenido de forma segura hasta completar la entrega.' },
+              { num: '04', icon: '📷', title: 'Check-in', desc: 'Evidencia fotográfica del inventario al momento del ingreso.' },
+              { num: '05', icon: '✅', title: 'Check-out', desc: 'Evaluación del espacio y liberación del pago al arrendador.' },
             ].map((step) => (
-              <div key={step.num} className="relative bg-white/3 border border-white/8 rounded-2xl p-8 hover:border-amber-400/30 transition-all group">
-                <div className="text-6xl font-black text-white/5 absolute top-6 right-6 select-none group-hover:text-amber-400/10 transition-colors">{step.num}</div>
+              <div key={step.num} className="relative bg-white/3 border border-white/8 rounded-2xl p-6 hover:border-amber-400/30 transition-all group">
+                <div className="text-5xl font-black text-white/5 absolute top-4 right-4 select-none group-hover:text-amber-400/10 transition-colors">{step.num}</div>
                 <div className="text-3xl mb-4">{step.icon}</div>
-                <h3 className="text-xl font-bold mb-3">{step.title}</h3>
-                <p className="text-white/50 leading-relaxed">{step.desc}</p>
+                <h3 className="text-lg font-bold mb-2">{step.title}</h3>
+                <p className="text-white/50 text-sm leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -233,6 +235,68 @@ export default function Home() {
               </div>
               <div className="bg-amber-400/10 border border-amber-400/20 rounded-xl p-4 text-sm text-amber-200/80">
                 💡 <strong>Ventaja única:</strong> Los arriendos informales no tienen esto. Con Storly, tu mercadería siempre está protegida.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="garantia-fgl" className="py-24 px-6 border-t border-white/5">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-[#2D4A3E]/30 border border-[#9BB896]/20 rounded-full px-3 py-1.5 text-xs text-[#9BB896] font-semibold uppercase tracking-widest mb-4">
+                Garantía operacional · Período transicional
+              </div>
+              <p className="text-[#C9A84C] text-sm font-semibold uppercase tracking-widest mb-3">Protección interna</p>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6">
+                Fondo de Garantía{' '}
+                <span className="text-[#9BB896]">Líquida Interna (FGL)</span>
+              </h2>
+              <p className="text-white/50 text-lg leading-relaxed mb-6">
+                Mientras negociamos la póliza formal con <strong className="text-white">HDI/BCI Seguros</strong>, Storly opera un fondo interno para cubrir imprevistos en las primeras transacciones.
+              </p>
+              <div className="bg-amber-400/8 border border-amber-400/15 rounded-xl p-4 text-sm text-amber-200/70 mb-6">
+                ⚠️ <strong className="text-amber-300">Importante:</strong> El FGL no es un seguro. Es una garantía operacional interna que cubre daños menores durante el período de rodaje de la plataforma.
+              </div>
+              <div className="space-y-4">
+                {[
+                  { icon: '🔄', text: 'Activo durante las primeras 20–50 transacciones de la plataforma' },
+                  { icon: '💧', text: 'Financiado por una retención parcial de cada comisión cobrada' },
+                  { icon: '🛠️', text: 'Cubre daños menores y pérdidas operacionales limitadas' },
+                  { icon: '🤝', text: 'Puente hasta formalizar la póliza con HDI o BCI Seguros' },
+                ].map((item) => (
+                  <div key={item.text} className="flex items-start gap-3">
+                    <span className="text-xl mt-0.5">{item.icon}</span>
+                    <span className="text-white/70">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-[#2D4A3E]/50 to-[#2D4A3E]/10 border border-[#9BB896]/20 rounded-3xl p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-[#2D4A3E] border border-[#C9A84C]/20 flex items-center justify-center text-2xl">💧</div>
+                <div>
+                  <div className="font-bold text-lg">FGL — Fondo de Garantía Líquida</div>
+                  <div className="text-sm text-white/40">Período transicional · Primeras 20–50 transacciones</div>
+                </div>
+              </div>
+              <div className="space-y-3 mb-6">
+                {[
+                  { label: 'Naturaleza', value: 'Garantía operacional (no seguro)', color: 'text-[#C9A84C]' },
+                  { label: 'Financiamiento', value: 'Retención parcial de comisión', color: 'text-white' },
+                  { label: 'Cobertura', value: 'Daños menores y pérdidas limitadas', color: 'text-[#C8D9B0]' },
+                  { label: 'Vigencia', value: '20–50 primeras transacciones', color: 'text-amber-400' },
+                  { label: 'Reemplazado por', value: 'Póliza formal HDI / BCI Seguros', color: 'text-white' },
+                ].map((row) => (
+                  <div key={row.label} className="flex justify-between items-center py-3 border-b border-white/5">
+                    <span className="text-white/60 text-sm">{row.label}</span>
+                    <span className={`font-semibold text-sm ${row.color}`}>{row.value}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-[#2D4A3E]/60 border border-[#9BB896]/20 rounded-xl p-4 text-sm text-[#C8D9B0]/80">
+                🌱 Una vez alcanzado el volumen suficiente, el FGL es reemplazado por una póliza de seguro formal con cobertura completa para todos los usuarios.
               </div>
             </div>
           </div>
@@ -356,7 +420,7 @@ export default function Home() {
     <div className="mt-8 bg-gradient-to-r from-amber-950/40 to-orange-950/20 border border-amber-400/20 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
       <div>
         <p className="font-bold text-white">Único en Chile con KYC + escrow + póliza en un solo flujo</p>
-        <p className="text-white/50 text-sm mt-1">NPS 62 · 80% tasa de cierre · decisión en 2.8 min · validado con 20 usuarias reales</p>
+        <p className="text-white/50 text-sm mt-1">NPS ~60 · 80% tasa de cierre · TAM $768.000M CLP · validado con 20 usuarias reales</p>
       </div>
       <Link href="/auth/registro" className="bg-amber-400 text-black font-bold px-6 py-3 rounded-xl hover:bg-amber-300 transition-all whitespace-nowrap">
         Comenzar gratis →
@@ -370,6 +434,24 @@ export default function Home() {
       <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">Para oferentes</p>
       <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-3">¿Cuánto puede ganar tu espacio?</h2>
       <p className="text-white/50 text-lg">Calcula tus ingresos estimados según tu espacio y disponibilidad</p>
+    </div>
+    <div className="grid grid-cols-3 gap-4 mb-8">
+      {[
+        { tier: 'Pequeño', size: '1–2 m³', price: '$35.000', commission: '$4.200', net: '$30.800' },
+        { tier: 'Mediano', size: '2–4 m³', price: '$48.500', commission: '$5.820', net: '$42.680' },
+        { tier: 'Grande', size: '4–6 m³', price: '$65.000', commission: '$7.800', net: '$57.200' },
+      ].map((t) => (
+        <div key={t.tier} className="bg-white/3 border border-white/8 rounded-2xl p-5 text-center hover:border-amber-400/20 transition-all">
+          <div className="text-xs text-[#C9A84C] font-bold uppercase tracking-widest mb-1">{t.tier}</div>
+          <div className="text-xs text-white/40 mb-3">{t.size}</div>
+          <div className="text-2xl font-black text-white">{t.price}</div>
+          <div className="text-xs text-white/30 mb-3">/mes</div>
+          <div className="border-t border-white/5 pt-3 space-y-1">
+            <div className="text-xs text-white/40">Comisión 12%: <span className="text-white/60">{t.commission}</span></div>
+            <div className="text-xs text-[#9BB896] font-semibold">Neto: {t.net}</div>
+          </div>
+        </div>
+      ))}
     </div>
     <CalculadoraOferentes />
   </div>
