@@ -229,7 +229,8 @@ export default function ExplorarPage() {
   useEffect(() => {
     navigator.geolocation?.getCurrentPosition(
       pos => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
-      () => {}
+      err => console.warn('Geolocation error:', err.message),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     )
   }, [])
 
