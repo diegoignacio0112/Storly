@@ -60,7 +60,7 @@ export async function sendWelcomeEmail(nombre: string, email: string) {
               </a>
             </div>
             <p style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;margin-top:24px;">
-              © 2025 Storly — Almacenamiento colaborativo en Chile
+              © 2026 Storly — Almacenamiento colaborativo en Chile
             </p>
           </div>
         </body>

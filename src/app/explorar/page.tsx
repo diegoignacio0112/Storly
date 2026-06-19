@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
+import { useSession } from 'next-auth/react'
 import type { MapEspacio } from './MapView'
 
 // ─── types ───────────────────────────────────────────────────────────────────
@@ -206,6 +207,7 @@ const MAX_PRICE = 1_500_000
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function ExplorarPage() {
+  const { data: session, status } = useSession()
   const [spaces, setSpaces] = useState<Espacio[]>([])
   const [loading, setLoading] = useState(true)
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null)
@@ -323,10 +325,24 @@ export default function ExplorarPage() {
           </div>
 
           <div className="ml-auto flex items-center gap-2 flex-shrink-0">
-            <Link href="/auth/login" className="text-sm text-white/50 hover:text-white transition-colors hidden lg:block">Iniciar sesión</Link>
-            <Link href="/auth/registro" className="text-sm bg-amber-400 text-black font-semibold px-3 py-1.5 rounded-lg hover:bg-amber-300 transition-colors whitespace-nowrap">
-              Comenzar
-            </Link>
+            {status === 'loading' ? (
+              <div className="w-24 h-8 bg-white/10 rounded-lg animate-pulse" />
+            ) : session?.user ? (
+              <>
+                <Link href="/mensajes" className="text-sm text-white/50 hover:text-white transition-colors hidden lg:block">Mensajes</Link>
+                <Link href="/perfil" className="text-sm text-white/50 hover:text-white transition-colors hidden lg:block">Perfil</Link>
+                <Link href="/dashboard" className="text-sm bg-amber-400 text-black font-semibold px-3 py-1.5 rounded-lg hover:bg-amber-300 transition-colors whitespace-nowrap">
+                  Dashboard
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login" className="text-sm text-white/50 hover:text-white transition-colors hidden lg:block">Iniciar sesión</Link>
+                <Link href="/auth/registro" className="text-sm bg-amber-400 text-black font-semibold px-3 py-1.5 rounded-lg hover:bg-amber-300 transition-colors whitespace-nowrap">
+                  Comenzar
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
