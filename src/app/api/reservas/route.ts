@@ -85,10 +85,14 @@ export async function GET(request: Request) {
     }
 
     if (id) {
+      const session = await getServerSession(authOptions)
+      if (!session?.user?.id) {
+        return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+      }
       const result = await pool.query(
         `SELECT r.*, e.titulo as espacio_titulo, e.tipo as espacio_tipo,
                 e.comuna as espacio_comuna, e.imagenes as espacio_imagenes,
-                e.precio_mensual,
+                e.precio_mensual, e.usuario_id as espacio_usuario_id,
                 u.nombre as usuario_nombre
          FROM reservas r
          JOIN espacios e ON r.espacio_id = e.id
@@ -99,7 +103,11 @@ export async function GET(request: Request) {
       if (result.rows.length === 0) {
         return NextResponse.json({ error: 'No encontrada' }, { status: 404 })
       }
-      return NextResponse.json(result.rows[0])
+      const reserva = result.rows[0]
+      if (String(session.user.id) !== String(reserva.usuario_id) && String(session.user.id) !== String(reserva.espacio_usuario_id)) {
+        return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
+      }
+      return NextResponse.json(reserva)
     }
 
     if (usuarioId) {

@@ -18,6 +18,8 @@ interface Notificacion {
 const TIPO_ICON: Record<string, string> = {
   nueva_reserva: '📋',
   nuevo_mensaje: '💬',
+  checkin_realizado: '📸',
+  checkout_realizado: '✅',
 }
 
 function timeAgo(d: string) {
@@ -80,6 +82,8 @@ export default function NotificationBell() {
       router.push(`/dashboard/espacio/${n.espacio_id}`)
     } else if (n.tipo === 'nuevo_mensaje') {
       router.push('/mensajes')
+    } else if ((n.tipo === 'checkin_realizado' || n.tipo === 'checkout_realizado') && n.reserva_id) {
+      router.push(`/reserva/${n.reserva_id}`)
     }
   }
 

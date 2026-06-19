@@ -36,6 +36,9 @@ const ESTADO_COLOR: Record<string, string> = {
   pendiente: 'bg-amber-400/10 text-amber-400',
   confirmado: 'bg-green-400/10 text-green-400',
   aprobada: 'bg-green-400/10 text-green-400',
+  en_uso: 'bg-green-400/10 text-green-400',
+  finalizada: 'bg-white/10 text-white/40',
+  disputa: 'bg-orange-400/10 text-orange-400',
   cancelado: 'bg-red-400/10 text-red-400',
   rechazada: 'bg-red-400/10 text-red-400',
   completado: 'bg-white/10 text-white/40',
@@ -251,7 +254,7 @@ export default function PerfilPage() {
                 </Link>
               </div>
             ) : reservas.map(r => (
-              <div key={r.id} className="bg-white/3 border border-white/8 rounded-2xl p-4 flex items-start justify-between gap-4 flex-wrap">
+              <Link key={r.id} href={`/reserva/${r.id}`} className="bg-white/3 border border-white/8 rounded-2xl p-4 flex items-start justify-between gap-4 flex-wrap hover:border-white/15 transition-all">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-xl bg-[#2D4A3E]/50 flex items-center justify-center text-xl">
                     {TIPO_ICON[r.espacio_tipo] ?? '📁'}
@@ -270,7 +273,7 @@ export default function PerfilPage() {
                   </span>
                   <p className="text-sm font-black text-[#C9A84C] mt-2">{fmt(r.precio_total)}</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

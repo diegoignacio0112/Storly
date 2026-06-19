@@ -62,6 +62,17 @@ export async function POST() {
       CREATE INDEX IF NOT EXISTS idx_vistas_espacio ON vistas_espacios(espacio_id);
     `)
 
+    await pool.query(`
+      ALTER TABLE reservas
+        ADD COLUMN IF NOT EXISTS checkin_fotos TEXT[],
+        ADD COLUMN IF NOT EXISTS checkin_fecha TIMESTAMP,
+        ADD COLUMN IF NOT EXISTS checkin_notas TEXT,
+        ADD COLUMN IF NOT EXISTS checkout_fotos TEXT[],
+        ADD COLUMN IF NOT EXISTS checkout_fecha TIMESTAMP,
+        ADD COLUMN IF NOT EXISTS checkout_notas TEXT,
+        ADD COLUMN IF NOT EXISTS disputa BOOLEAN DEFAULT false;
+    `)
+
     return NextResponse.json({ ok: true, message: 'Migrations applied' })
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)

@@ -113,8 +113,11 @@ function ConfirmacionContent() {
           </div>
         </div>
 
+        <Link href={`/reserva/${reserva.id}`} className="block w-full bg-amber-400 text-black font-bold py-3 rounded-xl text-center hover:bg-amber-300 transition-all text-sm mb-3">
+          Ver seguimiento de mi reserva →
+        </Link>
         <div className="flex gap-3">
-          <Link href="/dashboard" className="flex-1 bg-amber-400 text-black font-bold py-3 rounded-xl text-center hover:bg-amber-300 transition-all text-sm">
+          <Link href="/dashboard" className="flex-1 bg-white/5 border border-white/10 text-white font-semibold py-3 rounded-xl text-center hover:bg-white/8 transition-all text-sm">
             Ir al dashboard
           </Link>
           <Link href="/perfil" className="flex-1 bg-white/5 border border-white/10 text-white font-semibold py-3 rounded-xl text-center hover:bg-white/8 transition-all text-sm">

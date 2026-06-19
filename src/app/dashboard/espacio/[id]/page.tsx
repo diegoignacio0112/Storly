@@ -25,7 +25,7 @@ interface Stats {
   totalVistas: number
   vistasSemanaActual: number
   vistasPorDia: { fecha: string; count: number }[]
-  reservas: { pendientes: number; aprobadas: number; rechazadas: number; total: number }
+  reservas: { pendientes: number; aprobadas: number; enUso: number; finalizadas: number; rechazadas: number; total: number }
   mensajesNoLeidos: number
   mensajesTotal: number
 }
@@ -75,6 +75,9 @@ const TIPO_LABEL: Record<string, string> = {
 const ESTADO_BADGE: Record<string, string> = {
   pendiente: 'bg-amber-400/10 text-amber-400',
   aprobada: 'bg-green-400/10 text-green-400',
+  en_uso: 'bg-green-400/10 text-green-400',
+  finalizada: 'bg-white/10 text-white/40',
+  disputa: 'bg-orange-400/10 text-orange-400',
   rechazada: 'bg-red-400/10 text-red-400',
 }
 
@@ -453,6 +456,8 @@ export default function EspacioAnalyticsPage() {
             <div className="flex gap-1.5 flex-wrap">
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ESTADO_BADGE.pendiente}`}>{stats?.reservas.pendientes ?? 0} pend.</span>
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ESTADO_BADGE.aprobada}`}>{stats?.reservas.aprobadas ?? 0} aprob.</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ESTADO_BADGE.en_uso}`}>{stats?.reservas.enUso ?? 0} en uso</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ESTADO_BADGE.finalizada}`}>{stats?.reservas.finalizadas ?? 0} final.</span>
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ESTADO_BADGE.rechazada}`}>{stats?.reservas.rechazadas ?? 0} rech.</span>
             </div>
           </div>
@@ -493,7 +498,7 @@ export default function EspacioAnalyticsPage() {
                 <p className="text-white/40 text-sm">Aún no tienes solicitudes de arriendo</p>
               </div>
             ) : solicitudes.map(s => (
-              <div key={s.id} className="bg-white/3 border border-white/8 rounded-2xl p-4 flex items-start justify-between gap-4 flex-wrap">
+              <Link key={s.id} href={`/reserva/${s.id}`} className="bg-white/3 border border-white/8 rounded-2xl p-4 flex items-start justify-between gap-4 flex-wrap hover:border-white/15 transition-all">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-full bg-[#2D4A3E] flex items-center justify-center text-sm font-bold flex-shrink-0">
                     {s.usuario_nombre?.[0]?.toUpperCase()}
@@ -514,13 +519,13 @@ export default function EspacioAnalyticsPage() {
                   {s.estado === 'pendiente' && (
                     <div className="flex gap-2">
                       <button
-                        onClick={() => responder(s.id, 'rechazada')}
+                        onClick={e => { e.preventDefault(); e.stopPropagation(); responder(s.id, 'rechazada') }}
                         className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-400/20 text-red-400 hover:bg-red-400/10 transition-all"
                       >
                         Rechazar
                       </button>
                       <button
-                        onClick={() => responder(s.id, 'aprobada')}
+                        onClick={e => { e.preventDefault(); e.stopPropagation(); responder(s.id, 'aprobada') }}
                         className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-400 text-black hover:bg-amber-300 transition-all"
                       >
                         Aprobar
@@ -528,7 +533,7 @@ export default function EspacioAnalyticsPage() {
                     </div>
                   )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

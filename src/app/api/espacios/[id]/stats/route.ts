@@ -50,11 +50,13 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       `SELECT estado, COUNT(*)::int as total FROM reservas WHERE espacio_id = $1 GROUP BY estado`,
       [id]
     )
-    const reservas = { pendientes: 0, aprobadas: 0, rechazadas: 0, total: 0 }
+    const reservas = { pendientes: 0, aprobadas: 0, enUso: 0, finalizadas: 0, rechazadas: 0, total: 0 }
     for (const row of reservasResult.rows) {
       reservas.total += row.total
       if (row.estado === 'pendiente') reservas.pendientes = row.total
       else if (row.estado === 'aprobada') reservas.aprobadas = row.total
+      else if (row.estado === 'en_uso') reservas.enUso = row.total
+      else if (row.estado === 'finalizada') reservas.finalizadas = row.total
       else if (row.estado === 'rechazada') reservas.rechazadas = row.total
     }
 
