@@ -407,6 +407,15 @@ export default function DetalleEspacio() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [espacioId])
 
+  // log a view once per day per browser, fire-and-forget
+  useEffect(() => {
+    if (!espacioId) return
+    const key = `vista_${espacioId}_${new Date().toISOString().slice(0, 10)}`
+    if (localStorage.getItem(key)) return
+    localStorage.setItem(key, '1')
+    fetch(`/api/espacios/${espacioId}/vista`, { method: 'POST' })
+  }, [espacioId])
+
   const avgRating = reviews.length
     ? reviews.reduce((s, r) => s + (r.calificacion ?? 0), 0) / reviews.length
     : null

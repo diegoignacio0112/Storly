@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import NotificationBell from '@/components/NotificationBell'
 
 interface Espacio {
   id: string
@@ -13,6 +14,8 @@ interface Espacio {
   comuna: string
   disponible: boolean
   created_at: string
+  vistas_total: number
+  solicitudes_pendientes: number
 }
 
 const TIPO_LABEL: Record<string, string> = {
@@ -85,6 +88,7 @@ export default function Dashboard() {
             >
               + Publicar espacio
             </Link>
+            <NotificationBell />
             <button
               onClick={() => signOut({ callbackUrl: '/' })}
               className="text-sm text-white/40 hover:text-white/70 transition-colors px-3 py-2"
@@ -147,8 +151,9 @@ export default function Dashboard() {
         ) : (
           <div className="grid gap-4">
             {espacios.map(e => (
-              <div
+              <Link
                 key={e.id}
+                href={`/dashboard/espacio/${e.id}`}
                 className="bg-white/3 border border-white/8 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-white/12 transition-all"
               >
                 <div className="flex items-start gap-4">
@@ -163,6 +168,11 @@ export default function Dashboard() {
                       <span className={`text-xs rounded-full px-2.5 py-0.5 font-medium ${e.disponible ? 'bg-green-400/10 text-green-400' : 'bg-red-400/10 text-red-400'}`}>
                         {e.disponible ? '● Activo' : '○ Inactivo'}
                       </span>
+                      {e.solicitudes_pendientes > 0 && (
+                        <span className="text-xs rounded-full px-2.5 py-0.5 font-medium bg-amber-400/10 text-amber-400">
+                          {e.solicitudes_pendientes} solicitud{e.solicitudes_pendientes > 1 ? 'es' : ''} pendiente{e.solicitudes_pendientes > 1 ? 's' : ''}
+                        </span>
+                      )}
                     </div>
                     <h3 className="font-bold text-white">{e.titulo}</h3>
                     <p className="text-sm text-white/40 mt-0.5">
@@ -171,10 +181,13 @@ export default function Dashboard() {
                       {' · '}
                       <span className="text-[#C9A84C] font-semibold">{fmt(e.precio_mensual)}/mes</span>
                     </p>
+                    <p className="text-xs text-white/30 mt-1.5 flex items-center gap-1">
+                      <span>👁</span> {e.vistas_total ?? 0} vista{(e.vistas_total ?? 0) !== 1 ? 's' : ''}
+                    </p>
                   </div>
                 </div>
                 <button
-                  onClick={() => toggleDisponible(e.id, e.disponible)}
+                  onClick={e2 => { e2.preventDefault(); e2.stopPropagation(); toggleDisponible(e.id, e.disponible) }}
                   className={`text-sm font-medium px-4 py-2 rounded-xl border transition-all whitespace-nowrap ${
                     e.disponible
                       ? 'border-red-400/20 text-red-400 hover:bg-red-400/10'
@@ -183,7 +196,7 @@ export default function Dashboard() {
                 >
                   {e.disponible ? 'Desactivar' : 'Activar'}
                 </button>
-              </div>
+              </Link>
             ))}
           </div>
         )}

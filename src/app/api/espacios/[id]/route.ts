@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+
+const EDITABLE_FIELDS = ['titulo', 'descripcion', 'precio_mensual', 'metros_cuadrados', 'comuna', 'direccion', 'disponible'] as const
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params
@@ -22,12 +26,34 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 }
 
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+  }
+
   const { id } = await context.params
+
   try {
-    const { disponible } = await request.json()
+    const ownerResult = await pool.query(`SELECT usuario_id FROM espacios WHERE id = $1`, [id])
+    if (ownerResult.rows.length === 0) {
+      return NextResponse.json({ error: 'Espacio no encontrado' }, { status: 404 })
+    }
+    if (String(ownerResult.rows[0].usuario_id) !== String(session.user.id)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
+    }
+
+    const body = await request.json()
+    const updates = EDITABLE_FIELDS.filter(f => f in body)
+    if (updates.length === 0) {
+      return NextResponse.json({ error: 'Nada para actualizar' }, { status: 400 })
+    }
+
+    const setClause = updates.map((f, i) => `${f} = $${i + 1}`).join(', ')
+    const values = updates.map(f => body[f])
+
     const result = await pool.query(
-      'UPDATE espacios SET disponible = $1 WHERE id = $2 RETURNING *',
-      [disponible, id]
+      `UPDATE espacios SET ${setClause} WHERE id = $${updates.length + 1} RETURNING *`,
+      [...values, id]
     )
     return NextResponse.json(result.rows[0])
   } catch (error) {

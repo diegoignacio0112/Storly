@@ -21,8 +21,22 @@ export async function POST(request: Request) {
        VALUES ($1, $2, $3, $4) RETURNING *`,
       [session.user.id, para_usuario_id, espacio_id, mensaje.trim()]
     )
+    const nuevoMensaje = result.rows[0]
 
-    return NextResponse.json(result.rows[0], { status: 201 })
+    const espacioResult = await pool.query(`SELECT titulo FROM espacios WHERE id = $1`, [espacio_id])
+    const espacioTitulo = espacioResult.rows[0]?.titulo ?? 'tu espacio'
+    await pool.query(
+      `INSERT INTO notificaciones (usuario_id, tipo, titulo, mensaje, espacio_id, mensaje_id)
+       VALUES ($1, 'nuevo_mensaje', 'Nuevo mensaje', $2, $3, $4)`,
+      [
+        para_usuario_id,
+        `${session.user.name} te escribió sobre "${espacioTitulo}"`,
+        espacio_id,
+        nuevoMensaje.id,
+      ]
+    )
+
+    return NextResponse.json(nuevoMensaje, { status: 201 })
   } catch (error) {
     console.error(error)
     return NextResponse.json({ error: 'Error interno' }, { status: 500 })
@@ -63,6 +77,31 @@ export async function GET(request: Request) {
         `UPDATE mensajes SET leido = true
          WHERE espacio_id = $1 AND de_usuario_id = $2 AND para_usuario_id = $3 AND leido = false`,
         [espacio_id, otro_usuario_id, me]
+      )
+      return NextResponse.json(result.rows)
+    }
+
+    // All conversation threads about one specific space (grouped by other party)
+    if (espacio_id && !otro_usuario_id) {
+      const result = await pool.query(
+        `SELECT DISTINCT ON (LEAST(m.de_usuario_id, m.para_usuario_id), GREATEST(m.de_usuario_id, m.para_usuario_id))
+           m.*,
+           d.nombre as de_nombre,
+           p.nombre as para_nombre,
+           (SELECT COUNT(*) FROM mensajes unr
+            WHERE unr.espacio_id = m.espacio_id
+              AND unr.para_usuario_id = $1
+              AND unr.leido = false
+              AND (unr.de_usuario_id = m.de_usuario_id OR unr.de_usuario_id = m.para_usuario_id)
+           )::int as no_leidos
+         FROM mensajes m
+         JOIN usuarios d ON m.de_usuario_id = d.id
+         JOIN usuarios p ON m.para_usuario_id = p.id
+         WHERE m.espacio_id = $2 AND (m.de_usuario_id = $1 OR m.para_usuario_id = $1)
+         ORDER BY LEAST(m.de_usuario_id, m.para_usuario_id),
+                  GREATEST(m.de_usuario_id, m.para_usuario_id),
+                  m.created_at DESC`,
+        [me, espacio_id]
       )
       return NextResponse.json(result.rows)
     }

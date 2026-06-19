@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
+import NotificationBell from '@/components/NotificationBell'
 function CalculadoraOferentes() {
   const [metros, setMetros] = useState(6)
   const [dias, setDias] = useState(20)
@@ -111,6 +112,7 @@ export default function Home() {
               <>
                 <Link href="/mensajes" className="text-sm text-white/50 hover:text-white transition-colors hidden sm:block">Mensajes</Link>
                 <Link href="/perfil" className="text-sm text-white/50 hover:text-white transition-colors hidden sm:block">Perfil</Link>
+                <NotificationBell />
                 <Link href="/dashboard" className="text-sm bg-amber-400 text-black font-semibold px-4 py-2 rounded-lg hover:bg-amber-300 transition-colors">
                   Dashboard
                 </Link>

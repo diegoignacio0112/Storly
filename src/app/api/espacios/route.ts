@@ -14,7 +14,12 @@ export async function GET(request: Request) {
     // When fetching own spaces, return all regardless of disponible
     if (usuarioId) {
       const result = await pool.query(
-        'SELECT * FROM espacios WHERE usuario_id = $1 ORDER BY created_at DESC',
+        `SELECT e.*,
+           (SELECT COUNT(*) FROM vistas_espacios v WHERE v.espacio_id = e.id)::int as vistas_total,
+           (SELECT COUNT(*) FROM reservas r WHERE r.espacio_id = e.id AND r.estado = 'pendiente')::int as solicitudes_pendientes
+         FROM espacios e
+         WHERE e.usuario_id = $1
+         ORDER BY e.created_at DESC`,
         [usuarioId]
       )
       return NextResponse.json(result.rows)

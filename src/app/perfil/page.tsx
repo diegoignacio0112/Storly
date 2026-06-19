@@ -35,7 +35,9 @@ interface Espacio {
 const ESTADO_COLOR: Record<string, string> = {
   pendiente: 'bg-amber-400/10 text-amber-400',
   confirmado: 'bg-green-400/10 text-green-400',
+  aprobada: 'bg-green-400/10 text-green-400',
   cancelado: 'bg-red-400/10 text-red-400',
+  rechazada: 'bg-red-400/10 text-red-400',
   completado: 'bg-white/10 text-white/40',
 }
 

@@ -32,6 +32,36 @@ export async function POST() {
       );
     `)
 
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS notificaciones (
+        id SERIAL PRIMARY KEY,
+        usuario_id INTEGER REFERENCES usuarios(id) NOT NULL,
+        tipo VARCHAR(50) NOT NULL,
+        titulo VARCHAR(255) NOT NULL,
+        mensaje TEXT NOT NULL,
+        espacio_id INTEGER REFERENCES espacios(id),
+        reserva_id INTEGER REFERENCES reservas(id),
+        mensaje_id INTEGER,
+        leida BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `)
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS vistas_espacios (
+        id SERIAL PRIMARY KEY,
+        espacio_id INTEGER REFERENCES espacios(id) NOT NULL,
+        usuario_id INTEGER REFERENCES usuarios(id),
+        ip_hash VARCHAR(64),
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `)
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_notif_usuario ON notificaciones(usuario_id, leida);
+      CREATE INDEX IF NOT EXISTS idx_vistas_espacio ON vistas_espacios(espacio_id);
+    `)
+
     return NextResponse.json({ ok: true, message: 'Migrations applied' })
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
