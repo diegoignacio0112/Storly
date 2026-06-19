@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 
-export async function GET(request: Request, context: any) {
-  const id = context.params.id
+export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params
   try {
     const result = await pool.query(
       `SELECT e.*, u.nombre as oferente_nombre, u.email as oferente_email, u.telefono as oferente_telefono
@@ -22,8 +21,8 @@ export async function GET(request: Request, context: any) {
   }
 }
 
-export async function PATCH(request: Request, context: any) {
-  const id = context.params.id
+export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params
   try {
     const { disponible } = await request.json()
     const result = await pool.query(
