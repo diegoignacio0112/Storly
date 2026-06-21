@@ -10,7 +10,8 @@
     "db:manage": "ts-node scripts/db-manager.ts",
     "db:migrate": "ts-node scripts/run-migrations.ts",
     "db:export": "ts-node scripts/export-db.ts",
-    "db:import": "ts-node scripts/export-db.ts import"
+    "db:import": "ts-node scripts/export-db.ts import",
+    "db:backfill-geocode": "ts-node scripts/backfill-geocode.ts"
   },
   "dependencies": {
     "@types/leaflet": "^1.9.21",

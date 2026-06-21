@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { geocodeAddress } from '@/lib/geocode'
 
 export async function GET(request: Request) {
   try {
@@ -71,11 +72,23 @@ export async function POST(request: Request) {
       titulo, descripcion, tipo, metros_cuadrados, precio_mensual,
       comuna, direccion, disponible,
       nombre_contacto, telefono_contacto, email_contacto,
-      horario_acceso, caracteristicas, imagenes, condiciones
+      horario_acceso, caracteristicas, imagenes, condiciones,
+      lat, lng,
     } = await request.json()
 
     if (!titulo || !tipo || !precio_mensual || !comuna) {
       return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 })
+    }
+
+    // The publish form geocodes on the client for the preview map, but if it
+    // didn't run (or failed) we still need coordinates for the space to show
+    // up on /explorar, so fall back to a server-side geocode here.
+    let finalLat = typeof lat === 'number' ? lat : null
+    let finalLng = typeof lng === 'number' ? lng : null
+    if (finalLat === null || finalLng === null) {
+      const geocoded = await geocodeAddress(direccion, comuna)
+      finalLat = geocoded?.lat ?? null
+      finalLng = geocoded?.lng ?? null
     }
 
     const result = await pool.query(
@@ -83,8 +96,9 @@ export async function POST(request: Request) {
         usuario_id, titulo, descripcion, tipo, metros_cuadrados, precio_mensual,
         comuna, direccion, disponible,
         nombre_contacto, telefono_contacto, email_contacto,
-        horario_acceso, caracteristicas, imagenes, condiciones
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+        horario_acceso, caracteristicas, imagenes, condiciones,
+        lat, lng
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
       RETURNING *`,
       [
         session.user.id, titulo, descripcion || null, tipo,
@@ -94,7 +108,8 @@ export async function POST(request: Request) {
         horario_acceso || null,
         caracteristicas?.length ? caracteristicas : null,
         imagenes?.length ? imagenes : null,
-        condiciones || null
+        condiciones || null,
+        finalLat, finalLng,
       ]
     )
 

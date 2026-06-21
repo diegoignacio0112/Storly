@@ -3,6 +3,9 @@ import { useState, useRef, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
+
+const LocationPreviewMap = dynamic(() => import('./LocationPreviewMap'), { ssr: false })
 
 const COMUNAS = [
   'Cerrillos','Cerro Navia','Conchalí','El Bosque','Estación Central',
@@ -156,7 +159,37 @@ export default function NuevoEspacio() {
   const [loading, setLoading] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [geoStatus, setGeoStatus] = useState<'idle' | 'loading' | 'ok' | 'fallback' | 'error'>('idle')
+
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }))
+
+  // Geocode comuna + direccion as the user fills them in, so they can confirm
+  // the pin on the preview map before publishing.
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      if (!form.comuna) { setCoords(null); setGeoStatus('idle'); return }
+
+      setGeoStatus('loading')
+      fetch('/api/geocode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comuna: form.comuna, direccion: form.direccion }),
+      })
+        .then(async r => ({ ok: r.ok, data: await r.json() }))
+        .then(({ ok, data }) => {
+          if (ok) {
+            setCoords({ lat: data.lat, lng: data.lng })
+            setGeoStatus(data.source === 'nominatim' ? 'ok' : 'fallback')
+          } else {
+            setCoords(null); setGeoStatus('error')
+          }
+        })
+        .catch(() => { setCoords(null); setGeoStatus('error') })
+    }, 800)
+
+    return () => clearTimeout(handle)
+  }, [form.comuna, form.direccion])
 
   const toggleCaracteristica = (key: string) =>
     setCaracteristicas(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key])
@@ -184,6 +217,8 @@ export default function NuevoEspacio() {
         precio_mensual: parseInt(form.precio_mensual),
         caracteristicas: caracteristicas.length ? caracteristicas : null,
         imagenes: imagenes.length ? imagenes : null,
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
       })
     })
 
@@ -303,6 +338,28 @@ export default function NuevoEspacio() {
                 placeholder="Selecciona una comuna"
               />
             </Field>
+
+            {geoStatus === 'loading' && (
+              <p className="text-xs text-white/30 flex items-center gap-2">
+                <span className="w-3 h-3 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+                Ubicando dirección en el mapa...
+              </p>
+            )}
+
+            {coords && (geoStatus === 'ok' || geoStatus === 'fallback') && (
+              <div className="space-y-2">
+                <LocationPreviewMap lat={coords.lat} lng={coords.lng} />
+                <p className="text-xs text-white/30">
+                  {geoStatus === 'ok'
+                    ? 'Ubicación encontrada a partir de la dirección. Verifica que el pin esté en el lugar correcto.'
+                    : 'No se encontró la dirección exacta — se muestra el centro aproximado de la comuna.'}
+                </p>
+              </div>
+            )}
+
+            {geoStatus === 'error' && (
+              <p className="text-xs text-red-400">No se pudo ubicar la dirección ni la comuna en el mapa.</p>
+            )}
           </Section>
 
           <Section title="Información de contacto">
