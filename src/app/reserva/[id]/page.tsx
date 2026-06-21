@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef, Fragment } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -130,23 +130,45 @@ function Timeline({ stages }: { stages: Stage[] }) {
     status === 'done' ? 'bg-[#2D4A3E]' : status === 'rejected' ? 'bg-red-500/40' : 'bg-white/10'
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start gap-0">
-      {stages.map((s, i) => (
-        <Fragment key={s.key}>
-          <div className="flex sm:flex-col items-center gap-3 sm:gap-2 sm:flex-1 sm:text-center py-2 sm:py-0">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base flex-shrink-0 transition-all ${circleCls(s.status)}`}>
-              {s.status === 'done' ? '✓' : s.status === 'rejected' ? '✕' : s.icon}
+    <div className="w-full max-w-full overflow-hidden">
+
+      {/* mobile: vertical rail */}
+      <div className="flex flex-col md:hidden">
+        {stages.map((s, i) => (
+          <div key={s.key} className="flex gap-3">
+            <div className="flex flex-col items-center flex-shrink-0">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base flex-shrink-0 transition-all ${circleCls(s.status)}`}>
+                {s.status === 'done' ? '✓' : s.status === 'rejected' ? '✕' : s.icon}
+              </div>
+              {i < stages.length - 1 && <div className={`w-0.5 flex-1 min-h-[20px] my-1 ${lineCls(s.status)}`} />}
             </div>
-            <div>
-              <p className={`text-xs sm:text-sm font-semibold ${labelCls(s.status)}`}>{s.label}</p>
+            <div className="min-w-0 pb-5">
+              <p className={`text-sm font-semibold break-words ${labelCls(s.status)}`}>{s.label}</p>
               {s.date && <p className="text-xs text-white/30 mt-0.5">{formatDateTime(s.date)}</p>}
             </div>
           </div>
-          {i < stages.length - 1 && (
-            <div className={`w-0.5 h-4 ml-5 sm:ml-0 sm:w-full sm:h-0.5 sm:mt-5 sm:flex-shrink-0 ${lineCls(s.status)}`} />
-          )}
-        </Fragment>
-      ))}
+        ))}
+      </div>
+
+      {/* desktop: contained horizontal stepper */}
+      <div className="hidden md:flex md:items-start w-full max-w-full">
+        {stages.map((s, i) => (
+          <div key={s.key} className="flex items-start flex-1 min-w-0">
+            <div className="flex flex-col items-center flex-1 min-w-0 text-center px-1">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base flex-shrink-0 transition-all ${circleCls(s.status)}`}>
+                {s.status === 'done' ? '✓' : s.status === 'rejected' ? '✕' : s.icon}
+              </div>
+              <div className="mt-2 min-w-0 w-full">
+                <p className={`text-sm font-semibold break-words ${labelCls(s.status)}`}>{s.label}</p>
+                {s.date && <p className="text-xs text-white/30 mt-0.5">{formatDateTime(s.date)}</p>}
+              </div>
+            </div>
+            {i < stages.length - 1 && (
+              <div className={`flex-1 min-w-[10px] max-w-[28px] h-0.5 mt-5 ${lineCls(s.status)}`} />
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
